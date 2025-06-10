@@ -1,0 +1,20 @@
+# Database configuration for RDS
+rds_endpoint: "task-manager.c7mu0g8w2uu3.eu-west-1.rds.amazonaws.com"  # Replace with your RDS endpoint
+rds_db_name: "task-manager"
+rds_username: "admin"  # Replace with your RDS username
+rds_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          33376563323365326430303565633462326564383262336265313461343038626231303861313732
+          3139386638656336623562626265643836383533383535330a303764393433363866643164366435
+          66363136323465626563663233663466393161636236336261373739313834643937353166356537
+          6639626532613564310a393163363065366664386532306264613234613032323733646335313734
+          6562
+
+# Application settings
+github_repo: "https://github.com/kistlerk19/lamp-server.git"  # Replace with your repo
+github_branch: "main"
+ansible_python_interpreter: /usr/bin/python3
+# Security settings
+# firewall_allowed_ips:
+#   - "10.0.0.0/16"  # VPC CIDR
+#   - "YOUR_IP/32"   # Your management IP

@@ -1,0 +1,3 @@
+# Specific configuration for web1
+server_id: 1
+server_role: "primary"

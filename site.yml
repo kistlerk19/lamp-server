@@ -1,0 +1,31 @@
+---
+- import_playbook: lamp-deployment.yml
+  tags: ['deployment']
+
+- name: Post-deployment verification
+  hosts: webservers
+  tasks:
+    - name: Wait for Apache to be ready
+      wait_for:
+        port: 80
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 10
+        timeout: 60
+      
+    - name: Test application health
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}/health.php"
+        method: GET
+        status_code: 200
+      register: health_check
+      retries: 3
+      delay: 5
+      
+    - name: Display deployment status
+      debug:
+        msg: |
+          Deployment completed successfully!
+          Server: {{ ansible_hostname }}
+          IP: {{ ansible_default_ipv4.address }}
+          Application URL: http://{{ ansible_default_ipv4.address }}
+          Health Status: {{ health_check.status }}

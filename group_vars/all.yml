@@ -1,0 +1,12 @@
+# Global variables
+timezone: "UTC"
+ntp_enabled: true
+
+# SSL Configuration (optional)
+ssl_enabled: false
+ssl_cert_path: "/etc/ssl/certs/{{ app_name }}.crt"
+ssl_key_path: "/etc/ssl/private/{{ app_name }}.key"
+
+# Monitoring
+enable_monitoring: true
+log_retention_days: 30

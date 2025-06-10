@@ -1,0 +1,361 @@
+---
+- name: Deploy LAMP Stack Task Manager Application
+  hosts: webservers
+  become: yes
+  vars:
+    app_name: "task-manager"
+    app_user: "www-data"
+    app_directory: "/var/www/{{ app_name }}"
+    github_repo: "https://github.com/kistlerk19/lamp-server.git"
+    github_branch: "main"
+    
+    # Database configuration - use underscore instead of hyphen
+    db_host: "{{ rds_endpoint }}"
+    db_name: "task-manager"  # Changed from task-manager to taskmanager
+    db_username: "{{ rds_username }}"
+    db_password: "{{ rds_password }}"
+    db_port: "3306"
+    
+  tasks:
+    - name: Update system packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+      tags: system
+
+    - name: Detect available PHP version
+      shell: |
+        if apt-cache show php8.3 >/dev/null 2>&1; then
+          echo "8.3"
+        elif apt-cache show php8.2 >/dev/null 2>&1; then
+          echo "8.2"
+        elif apt-cache show php8.1 >/dev/null 2>&1; then
+          echo "8.1"
+        else
+          echo "8.0"
+        fi
+      register: available_php_version
+      changed_when: false
+      tags: php_detection
+
+    - name: Set PHP version based on availability
+      set_fact:
+        php_version: "{{ available_php_version.stdout }}"
+      tags: php_detection
+
+    - name: Display detected PHP version
+      debug:
+        msg: "Using PHP version: {{ php_version }}"
+      tags: php_detection
+
+    - name: Install prerequisite packages
+      apt:
+        name:
+          - software-properties-common
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+      tags: prerequisites
+
+    # Only add Sury repository for older Ubuntu versions
+    - name: Add Ondřej Surý's PHP repository (for Ubuntu < 24.04)
+      block:
+        - name: Add Ondřej Surý's PHP repository key
+          apt_key:
+            url: https://packages.sury.org/php/apt.gpg
+            state: present
+
+        - name: Add Ondřej Surý's PHP repository
+          apt_repository:
+            repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
+            state: present
+            update_cache: yes
+      when: 
+        - ansible_distribution == 'Ubuntu'
+        - ansible_distribution_release not in ['noble', 'oracular']
+        - php_version == '8.2'
+      tags: php_repo
+
+    - name: Install required packages
+      apt:
+        name:
+          - apache2
+          - php{{ php_version }}
+          - php{{ php_version }}-cli
+          - php{{ php_version }}-common
+          - php{{ php_version }}-mysql
+          - php{{ php_version }}-zip
+          - php{{ php_version }}-gd
+          - php{{ php_version }}-mbstring
+          - php{{ php_version }}-curl
+          - php{{ php_version }}-xml
+          - php{{ php_version }}-bcmath
+          - libapache2-mod-php{{ php_version }}
+          - git
+          - mysql-client
+          - unzip
+          - python3-pip
+          - python3-dev
+          - default-libmysqlclient-dev
+          - build-essential
+        state: present
+      tags: packages
+
+    - name: Install PyMySQL from apt
+      apt:
+        name: python3-pymysql
+        state: present
+      tags: packages
+
+    # Handle php-json separately as it's not needed in PHP 8.0+
+    - name: Install php-json for older PHP versions
+      apt:
+        name: php{{ php_version }}-json
+        state: present
+      when: php_version is version('8.0', '<')
+      ignore_errors: yes
+      tags: packages
+
+    - name: Enable Apache headers module
+      command: a2enmod headers
+      notify: restart apache
+      tags: apache
+
+    - name: Configure Apache to prioritize PHP
+      ansible.builtin.copy:
+        content: |
+          <IfModule mod_dir.c>
+              DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+          </IfModule>
+        dest: /etc/apache2/mods-enabled/dir.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart apache
+
+    - name: Create PHP info test file
+      ansible.builtin.copy:
+        content: |
+          <?php
+          phpinfo();
+          ?>
+        dest: /var/www/html/info.php
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Set permissions for web directory
+      ansible.builtin.file:
+        path: /var/www/html
+        owner: www-data
+        group: www-data
+        mode: '0755'
+        recurse: yes
+
+    - name: Ensure python3-pymysql is installed for MySQL tasks
+      ansible.builtin.apt:
+        name: python3-pymysql
+        state: present
+
+    - name: Create application directory
+      file:
+        path: "{{ app_directory }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+      tags: setup
+
+    - name: Clone application from GitHub
+      git:
+        repo: "{{ github_repo }}"
+        dest: "{{ app_directory }}"
+        version: "{{ github_branch }}"
+        force: yes
+      become_user: "{{ app_user }}"
+      tags: deployment
+
+    - name: Set ownership of application files
+      file:
+        path: "{{ app_directory }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        recurse: yes
+      tags: deployment
+
+    # NEW: Create required upload directories
+    - name: Create upload and session directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+      loop:
+        - "{{ app_directory }}/uploads"
+        - "{{ app_directory }}/uploads/tmp"
+        - "{{ app_directory }}/uploads/sessions"
+      tags: deployment
+
+    - name: Create .env file from template
+      template:
+        src: env.j2
+        dest: "{{ app_directory }}/.env"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0600'
+      tags: config
+
+    - name: Update database.php to use environment variables
+      template:
+        src: database.php.j2
+        dest: "{{ app_directory }}/config/database.php"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0644'
+      tags: config
+
+    - name: Create Apache virtual host
+      template:
+        src: apache-vhost.j2
+        dest: "/etc/apache2/sites-available/{{ app_name }}.conf"
+        owner: root
+        group: root
+        mode: '0644'
+      vars:
+        document_root: "{{ app_directory }}"
+      notify: restart apache
+      tags: apache
+
+    - name: Disable default Apache site
+      command: a2dissite 000-default
+      notify: restart apache
+      tags: apache
+
+    - name: Enable application site
+      command: a2ensite {{ app_name }}
+      notify: restart apache
+      tags: apache
+
+    - name: Remove default Apache index.html
+      file:
+        path: /var/www/html/index.html
+        state: absent
+      tags: apache
+
+    - name: Create PHP configuration
+      template:
+        src: php.ini.j2
+        dest: "/etc/php/{{ php_version }}/apache2/conf.d/99-custom.ini"
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart apache
+      tags: php
+
+    - name: Wait for RDS to be accessible
+      wait_for:
+        host: "{{ db_host }}"
+        port: "{{ db_port }}"
+        timeout: 300
+      tags: database
+
+    - name: Initialize database
+      mysql_db:
+        login_host: "{{ db_host }}"
+        login_user: "{{ db_username }}"
+        login_password: "{{ db_password }}"
+        login_port: "{{ db_port }}"
+        name: "`{{ db_name }}`"
+        state: present
+        config_file: ""
+      environment:
+        PYTHONPATH: "/usr/local/lib/python3/dist-packages:/usr/lib/python3/dist-packages"
+      run_once: true
+      ignore_errors: yes
+      register: db_create_result
+      tags: database
+
+    - name: Import database schema using mysql command
+      shell: |
+        mysql -h {{ db_host }} -P {{ db_port }} -u {{ db_username }} -p{{ db_password }} < {{ app_directory }}/sql/database_setup.sql
+      run_once: true
+      register: schema_import_result
+      failed_when: 
+        - schema_import_result.rc != 0
+        - "'already exists' not in schema_import_result.stderr"
+      tags: database
+
+    - name: Display schema import result
+      debug:
+        msg: "Schema import completed successfully"
+      when: schema_import_result.rc == 0
+      run_once: true
+      tags: database
+
+    - name: Set up log rotation for application logs
+      template:
+        src: logrotate.j2
+        dest: "/etc/logrotate.d/{{ app_name }}"
+        owner: root
+        group: root
+        mode: '0644'
+      tags: logging
+
+    - name: Create application log directory
+      file:
+        path: "/var/log/{{ app_name }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+      tags: logging
+
+    - name: Install health check script
+      template:
+        src: health-check.sh.j2
+        dest: "/usr/local/bin/{{ app_name }}-health-check"
+        owner: root
+        group: root
+        mode: '0755'
+      tags: monitoring
+
+    - name: Set up health check cron job
+      cron:
+        name: "{{ app_name }} health check"
+        minute: "*/5"
+        job: "/usr/local/bin/{{ app_name }}-health-check"
+        user: root
+      tags: monitoring
+
+    - name: Configure firewall
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - '80'
+        - '443'
+        - '22'
+      tags: security
+
+    - name: Enable firewall
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+      tags: security
+
+  handlers:
+    - name: restart apache
+      service:
+        name: apache2
+        state: restarted
+
+    - name: reload apache
+      service:
+        name: apache2
+        state: reloaded

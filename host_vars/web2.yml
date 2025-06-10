@@ -1,0 +1,3 @@
+# Specific configuration for web2
+server_id: 2
+server_role: "secondary"

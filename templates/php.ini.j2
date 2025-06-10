@@ -1,0 +1,32 @@
+; Custom PHP configuration for Task Manager Application
+
+; Error handling
+display_errors = Off
+log_errors = On
+error_log = /var/log/{{ app_name }}/php_errors.log
+
+; Security settings
+expose_php = Off
+allow_url_fopen = Off
+allow_url_include = Off
+
+; Session settings
+session.cookie_httponly = 1
+session.cookie_secure = 0
+session.use_strict_mode = 1
+session.gc_maxlifetime = 7200
+
+; Upload settings
+file_uploads = On
+upload_max_filesize = 10M
+max_file_uploads = 5
+
+; Memory and execution
+memory_limit = 256M
+max_execution_time = 30
+max_input_time = 60
+
+; MySQL settings
+mysqli.default_host = {{ db_host }}
+mysqli.default_user = {{ db_username }}
+mysqli.default_pw = {{ db_password }}

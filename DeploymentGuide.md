@@ -4,7 +4,7 @@ This guide provides comprehensive instructions for deploying the Task Manager ap
 
 ## Architecture Overview
 
-![Architecture Diagram](https://via.placeholder.com/800x400?text=Architecture+Diagram)
+![Architecture Diagram](https://raw.githubusercontent.com/kistlerk19/lamp-server/main/screenshots/aws-architecture.png)
 
 - **Web Tier**: 2 EC2 instances running Apache and PHP
 - **Database Tier**: RDS MySQL instance in a private subnet

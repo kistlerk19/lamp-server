@@ -2,20 +2,20 @@
 
 A comprehensive web-based task management application built with PHP, MySQL, and Bootstrap. This application provides a complete CRUD (Create, Read, Update, Delete) interface for managing tasks with features like priority levels, due dates, and status tracking.
 
-![Task Manager Screenshot](https://via.placeholder.com/800x400?text=Task+Manager+Screenshot)
+![Task Manager Screenshot](https://raw.githubusercontent.com/kistlerk19/lamp-server/main/screenshots/task-manager-dashboard.png)
 
 ## Features
 
-- ✅ **CRUD Operations**: Create, read, update, and delete tasks
-- 🎯 **Priority Levels**: Low, Medium, and High priority settings
-- 📅 **Due Date Tracking**: Set and track task due dates with visual indicators
-- 📊 **Status Management**: Pending, In Progress, and Completed statuses
-- 🔍 **Advanced Filtering**: Filter tasks by status, priority, and search terms
-- 📱 **Responsive Design**: Mobile-friendly interface using Bootstrap 5
-- ⚡ **Real-time Feedback**: Success/error messages and form validation
-- 🎨 **Modern UI**: Clean and intuitive user interface with animations
-- 🔒 **Security Features**: CSRF protection, input sanitization, and secure database access
-- 🚀 **Ansible Deployment**: Automated deployment to AWS infrastructure
+-  **CRUD Operations**: Create, read, update, and delete tasks
+-  **Priority Levels**: Low, Medium, and High priority settings
+-  **Due Date Tracking**: Set and track task due dates with visual indicators
+-  **Status Management**: Pending, In Progress, and Completed statuses
+-  **Advanced Filtering**: Filter tasks by status, priority, and search terms
+-  **Responsive Design**: Mobile-friendly interface using Bootstrap 5
+-  **Real-time Feedback**: Success/error messages and form validation
+-  **Modern UI**: Clean and intuitive user interface with animations
+-  **Security Features**: CSRF protection, input sanitization, and secure database access
+-  **Ansible Deployment**: Automated deployment to AWS infrastructure
 
 ## Technology Stack
 

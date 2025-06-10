@@ -10,7 +10,7 @@ GITHUB_BRANCH="main"
 APP_NAME="task-manager"
 APP_DIR="/var/www/${APP_NAME}"
 DB_HOST="task-manager.c7mu0g8w2uu3.eu-west-1.rds.amazonaws.com"
-DB_NAME="task_manager"
+DB_NAME="task-manager"
 DB_USERNAME="admin"
 DB_PASSWORD="PHASE2LABONE"  # Consider using AWS Secrets Manager
 
@@ -133,7 +133,7 @@ class Database {
     
     public function __construct() {
         $this->host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?? 'localhost';
-        $this->db_name = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?? 'task_manager';
+        $this->db_name = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?? 'task-manager';
         $this->username = $_ENV['DB_USERNAME'] ?? getenv('DB_USERNAME') ?? 'root';
         $this->password = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?? '';
         $this->port = $_ENV['DB_PORT'] ?? getenv('DB_PORT') ?? 3306;

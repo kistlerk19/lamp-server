@@ -92,7 +92,7 @@ Edit `group_vars/webservers.yml`:
 ```yaml
 # Replace with your actual values
 rds_endpoint: "your-rds-endpoint.region.rds.amazonaws.com"
-rds_db_name: "task_manager"
+rds_db_name: "task-manager"
 rds_username: "admin"
 github_repo: "https://github.com/yourusername/task-manager.git"
 ```
@@ -227,7 +227,7 @@ sudo systemctl status apache2
 sudo systemctl status mysql
 
 # Test database connection
-mysql -h your-rds-endpoint.region.rds.amazonaws.com -u admin -p task_manager
+mysql -h your-rds-endpoint.region.rds.amazonaws.com -u admin -p task-manager
 
 # Check disk space
 df -h
@@ -333,19 +333,19 @@ cat > /usr/local/bin/backup-database.sh << 'EOF'
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_DIR="/var/backups/mysql"
 DB_HOST="your-rds-endpoint.region.rds.amazonaws.com"
-DB_NAME="task_manager"
+DB_NAME="task-manager"
 DB_USER="admin"
 DB_PASS="your-password"
 
 mkdir -p $BACKUP_DIR
 
-mysqldump -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME > $BACKUP_DIR/task_manager_$DATE.sql
+mysqldump -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME > $BACKUP_DIR/task-manager_$DATE.sql
 
 # Keep only last 7 days of backups
-find $BACKUP_DIR -name "task_manager_*.sql" -mtime +7 -delete
+find $BACKUP_DIR -name "task-manager_*.sql" -mtime +7 -delete
 
 # Compress older backups
-find $BACKUP_DIR -name "task_manager_*.sql" -mtime +1 -exec gzip {} \;
+find $BACKUP_DIR -name "task-manager_*.sql" -mtime +1 -exec gzip {} \;
 EOF
 
 chmod +x /usr/local/bin/backup-database.sh

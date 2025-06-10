@@ -2,8 +2,8 @@
 -- Run this script to create the database and table structure
 
 -- Create database
-CREATE DATABASE IF NOT EXISTS task_manager;
-USE task_manager;
+CREATE DATABASE IF NOT EXISTS task-manager;
+USE task-manager;
 
 -- Create tasks table
 CREATE TABLE IF NOT EXISTS tasks (
@@ -32,5 +32,5 @@ INSERT INTO tasks (title, description, priority, due_date, status) VALUES
 
 -- Create a user for the application (optional, for production)
 -- CREATE USER 'taskapp'@'%' IDENTIFIED BY 'secure_password_here';
--- GRANT SELECT, INSERT, UPDATE, DELETE ON task_manager.* TO 'taskapp'@'%';
+-- GRANT SELECT, INSERT, UPDATE, DELETE ON task-manager.* TO 'taskapp'@'%';
 -- FLUSH PRIVILEGES;

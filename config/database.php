@@ -25,7 +25,7 @@ class Database {
     public function __construct() {
         // Load configuration from environment variables with fallbacks
         $this->host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?? 'localhost';
-        $this->db_name = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?? 'task_manager';
+        $this->db_name = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?? 'task-manager';
         $this->username = $_ENV['DB_USERNAME'] ?? getenv('DB_USERNAME') ?? 'root';
         $this->password = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?? '';
         $this->port = $_ENV['DB_PORT'] ?? getenv('DB_PORT') ?? 3306;

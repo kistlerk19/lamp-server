@@ -5,14 +5,14 @@
 set -e
 
 # Variables (replace with your actual values)
-GITHUB_REPO="https://github.com/yourusername/task-manager.git"
+GITHUB_REPO="https://github.com/kistlerk19/lamp-server.git"
 GITHUB_BRANCH="main"
 APP_NAME="task-manager"
 APP_DIR="/var/www/${APP_NAME}"
-DB_HOST="your-rds-endpoint.region.rds.amazonaws.com"
+DB_HOST="task-manager.c7mu0g8w2uu3.eu-west-1.rds.amazonaws.com"
 DB_NAME="task_manager"
 DB_USERNAME="admin"
-DB_PASSWORD="your-rds-password"  # Consider using AWS Secrets Manager
+DB_PASSWORD="PHASE2LABONE"  # Consider using AWS Secrets Manager
 
 # Logging
 LOG_FILE="/var/log/user-data.log"

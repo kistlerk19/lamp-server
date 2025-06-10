@@ -2,11 +2,11 @@
 -- Run this script to create the database and table structure
 
 -- Create database
-CREATE DATABASE IF NOT EXISTS task-manager;
-USE task-manager;
+CREATE DATABASE IF NOT EXISTS `task-manager`;
+USE `task-manager`;
 
--- Create tasks table
-CREATE TABLE IF NOT EXISTS tasks (
+-- Create `tasks` table
+CREATE TABLE IF NOT EXISTS `tasks` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS tasks (
 );
 
 -- Insert sample data for testing
-INSERT INTO tasks (title, description, priority, due_date, status) VALUES
+INSERT INTO `tasks` (title, description, priority, due_date, status) VALUES
 ('Setup LAMP Stack', 'Configure Apache, MySQL, and PHP on AWS EC2', 'High', '2025-06-10', 'In Progress'),
 ('Database Optimization', 'Optimize MySQL queries and add proper indexing', 'Medium', '2025-06-15', 'Pending'),
 ('Security Review', 'Conduct security audit of the application', 'High', '2025-06-12', 'Pending'),

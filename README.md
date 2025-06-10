@@ -160,20 +160,6 @@ task-manager/
 - **Browser Caching**: Static assets configured for optimal caching
 - **Minimal Dependencies**: Lightweight implementation with few external dependencies
 
-## Contributing
+## Author
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -am 'Add new feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Bootstrap team for the excellent UI framework
-- PHP and MySQL communities for documentation and support
-- Ansible team for the deployment automation tools
+Ishmael Gyamfi (June 2025)

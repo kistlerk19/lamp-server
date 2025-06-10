@@ -399,3 +399,7 @@ tar -czf /var/backups/task-manager-$(date +%Y%m%d).tar.gz \
 This deployment guide provides a comprehensive approach to deploying and maintaining the Task Manager application on AWS infrastructure using Ansible automation. By following these instructions, you can ensure a secure, reliable, and scalable deployment of your application.
 
 For additional support or questions, please contact the development team or refer to the project documentation.
+
+## Author
+
+Ishmael Gyamfi (June 2025)
